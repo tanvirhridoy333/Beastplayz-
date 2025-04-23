@@ -16,7 +16,7 @@
 ## Project Status
 
 - [x] GitHub Repository Created  
-- [ ] Website UI Design  
+- [x] Website UI Design  
 - [ ] Multiplayer Chess  
 - [ ] User Login System  
 - [ ] Netlify Deployment  
