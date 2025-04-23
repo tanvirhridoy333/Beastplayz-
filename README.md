@@ -40,6 +40,8 @@ import React from "react"; import { Button } from "@/components/ui/button"; impo
 
 const games = [ { name: "Chess", mode: "Single / Multiplayer" }, { name: "Ludo", mode: "Single / Multiplayer" }, { name: "Carrom", mode: "Single / Multiplayer" }, { name: "Car Racing", mode: "Single" }, { name: "Brain Games", mode: "Single" }, ];
 
+##website ui design
+
 export default function BeastplayzUI() { return ( <div className="min-h-screen bg-gradient-to-b from-[#0f0f0f] to-[#1a1a1a] text-white px-4 py-8"> {/* Navbar */} <nav className="flex justify-between items-center mb-8"> <h1 className="text-2xl font-bold text-green-400">Beastplayz</h1> <div className="space-x-4"> <Button variant="ghost">Home</Button> <Button variant="ghost">Games</Button> <Button variant="ghost">Leaderboard</Button> <Button className="rounded-full bg-green-500 text-black">Login</Button> </div> </nav>
 
 {/* Hero Section */}
