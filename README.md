@@ -82,4 +82,132 @@ export default function BeastplayzUI() { return ( <div className="min-h-screen b
 </div>
 
 ); }
+##Multiplayer chess 
+ project structure 
+ 
+multiplayer-chess/
+├── client/         <-- React Frontend
+│   └── src/
+│       └── ChessGame.jsx
+├── server/         <-- Node.js Backend
+│   └── server.js
+├── package.json
+backend 
+// server/server.js
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*"
+  }
+});
+
+let players = {};
+
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  if (Object.keys(players).length < 2) {
+    players[socket.id] = Object.keys(players).length === 0 ? 'white' : 'black';
+    socket.emit('player-color', players[socket.id]);
+  } else {
+    socket.emit('room-full');
+    return;
+  }
+
+  socket.on('move', (data) => {
+    socket.broadcast.emit('opponent-move', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+    delete players[socket.id];
+    io.emit('opponent-left');
+  });
+});
+
+server.listen(4000, () => {
+  console.log('Server listening on port 4000');
+});
+
+fortend
+// client/src/ChessGame.jsx
+import React, { useEffect, useState } from 'react';
+import Chessboard from 'chessboardjsx';
+import { Chess } from 'chess.js';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:4000');
+const game = new Chess();
+
+export default function ChessGame() {
+  const [fen, setFen] = useState('start');
+  const [color, setColor] = useState('white');
+
+  useEffect(() => {
+    socket.on('player-color', (assignedColor) => {
+      setColor(assignedColor);
+    });
+
+    socket.on('opponent-move', (move) => {
+      game.move(move);
+      setFen(game.fen());
+    });
+
+    socket.on('opponent-left', () => {
+      alert("Opponent left the game.");
+    });
+
+    return () => socket.disconnect();
+  }, []);
+
+  const onDrop = ({ sourceSquare, targetSquare }) => {
+    const move = {
+      from: sourceSquare,
+      to: targetSquare,
+      promotion: 'q',
+    };
+
+    const result = game.move(move);
+    if (result) {
+      setFen(game.fen());
+      socket.emit('move', move);
+    }
+  };
+
+  return (
+    <div>
+      <h2>You are playing as {color}</h2>
+      <Chessboard
+        width={500}
+        position={fen}
+        onDrop={onDrop}
+        orientation={color}
+        draggable
+      />
+    </div>
+  );
+} 
+fortend setup
+
+npm install chessboardjsx chess.js socket.io-client
+backend setup 
+npm install express socket.io cors
+
+
+backend start
+
+cd server
+node server.js
+fortend start
+
+cd client
+npm start
 
